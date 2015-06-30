@@ -5,19 +5,22 @@
 namespace bandit{
 
 //Relative Upper Confidence Bound (RUCB)
+//Note that there is another version of RUCB (see also policy_rucb_arxiv.hpp)
 class RUCBPolicy : public Policy{
   const uint K;
   const uint T;
   const double alpha;
   std::vector<std::vector<uint> > W; //W[i][j] = num that i beats j
   std::vector<std::vector<uint> > WpWT; //W + W^T
+  std::set<uint> B;
 public:
   RUCBPolicy(uint K, uint T, double alpha = 0.51): K(K), T(T), alpha(alpha) {
     W = std::vector<std::vector<uint> >(K, std::vector<uint>(K, 0));
     WpWT = std::vector<std::vector<uint> >(K, std::vector<uint>(K, 0));
+    B.clear();
   }
-  uint findC(const std::vector<std::vector<double> > &U){ //find arm that is as strong as the other arms
-    std::vector<uint> cs;
+  std::vector<uint> getC(const std::vector<std::vector<double> > &U){
+    std::vector<uint> C;
     for(uint i=0;i<K;++i){
       bool lost = false;
       for(uint j=0;j<K;++j){
@@ -27,14 +30,17 @@ public:
         }
       }
       if(!lost){
-        cs.push_back(i);
+        C.push_back(i);
       }
     }
+    return C;
+    /*
     if(cs.size()>=1){
       return cs[std::uniform_int_distribution<int>(0, cs.size()-1)(randomEngine)];
     }else{ //no condorcet winner
       return std::uniform_int_distribution<int>(0, K-1)(randomEngine);
     }
+    */
   }
   uint findStrongestOpponent(const std::vector<std::vector<double> > &U, uint c){
     uint j = 0;
@@ -48,6 +54,10 @@ public:
     return j;
   }
   virtual std::pair<uint,uint> selectNextPair(uint t){
+    if(B.size()>1){
+      std::cerr << "unexpected error: B.size()>1" << std::endl;
+      exit(0);
+    }
     //build U
     std::vector<std::vector<double> > U = std::vector<std::vector<double> >(K, std::vector<double>(K, 0));
     for(uint i=0;i<K;++i){
@@ -61,8 +71,46 @@ public:
         }
       }
     }
-    uint c = findC(U);
+    std::vector<uint> C = getC(U);
+    uint c;
+    if(C.size()==0){
+      c = std::uniform_int_distribution<int>(0, K-1)(randomEngine);
+    }
+    if(B.size()>0){
+      bool B_exist_in_C = false;
+      for(uint i=0;i<C.size();++i){
+        if( (*(B.begin())) == C[i] ){
+          B_exist_in_C = true;
+          break;
+        }
+      }
+      if(!B_exist_in_C){
+        B.clear(); //B = nullset
+      }
+    } 
+    if(C.size() == 1){
+      B.clear();
+      B.insert(C[0]);
+      c = C[0];
+    }else if(C.size() > 1){
+      if(B.size()==1){
+        if(std::uniform_int_distribution<uint>(0, 1)(randomEngine) >= 1){
+          c = *(B.begin());
+        }else{
+          while(true){
+            uint cc = C[std::uniform_int_distribution<uint>(0, C.size()-1)(randomEngine)];
+            if(cc != *(B.begin()) ){
+              c = cc;
+              break;
+            }
+          }
+        }
+      }else{ //B.size() == 0
+        c = C[ std::uniform_int_distribution<uint>(0, C.size()-1)(randomEngine) ];
+      }
+    }
     uint d = findStrongestOpponent(U, c);
+
     return std::make_pair(c,d);
   }
   virtual void updateState(std::pair<uint, uint> armPair, uint result, uint /*t*/){
