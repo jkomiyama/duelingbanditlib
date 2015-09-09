@@ -91,3 +91,8 @@
   Junpei Komiyama (junpei.komiyama atmark gmail.com)
 
   This software is released under the MIT License, see LICENSE.txt.
+
+  Please acknowledge its use with a citation: 
++  Junpei Komiyama, Junya Honda, Hisashi Kashima, Hiroshi Nakagawa. Regret Lower Bound and Optimal Algorithm in Dueling Bandit Problem. In Proceedings of the 28th Annual Conference on Learning Theory (COLT 2015), pages 1141-1154
+, July 2015
+  
