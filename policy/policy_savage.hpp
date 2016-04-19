@@ -6,7 +6,7 @@ namespace bandit{
 
 //Savage algorithm
 class SavagePolicy : public Policy{
-  const uint K; //N=K^2 in condorcet (or other dueling) SAVAGE
+  const uint K; //N=K*(K-1)/2 in condorcet (or other dueling) SAVAGE
   const uint T;
   const double delta;
   std::vector<std::vector<uint> > resultMatrix;
@@ -20,7 +20,7 @@ public:
     }
   }
   double getConfidenceBound(uint sampleNum){
-    return sqrt(log(2*K*T/delta)/(2.0*sampleNum));
+    return sqrt(log(K*(K-1)*T/delta)/(2.0*sampleNum));
   }
   std::pair<uint, uint> minimumTrialPair(){
     if(W.size() <= 1){
