@@ -33,6 +33,9 @@ public:
       const uint i = *it;
       for(std::set<uint>::iterator it2 = W.begin(); it2 != W.end(); it2++){
         const uint j = *it2;
+        if(i==j){
+          continue;
+        }
         uint n = resultMatrix[i][j] + resultMatrix[j][i];
         if(n<mv){
           mv = n;
