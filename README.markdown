@@ -76,6 +76,10 @@
 ## 4\. Misc
   The ascii art is from [9].
   
+## 5\. Acknowledgement
+  The author thanks Huasen Wu for pointing out our misimplementation (fixed) of the Condorcet SAVAGE algortihm.
+
+  
 ##References
     [1] Junpei Komiyama, Junya Honda, Hisashi Kashima, Hiroshi Nakagawa: Regret Lower Bound and Optimal Algorithm in Dueling Bandit Problem. In COLT, 2015
     [2] Yisong Yue, Josef Broder, Robert Kleinberg, and Thorsten Joachims: The k-armed dueling bandits problem. J. Comput. Syst. Sci., 78(5):1538–1556, 2012.
