@@ -192,7 +192,7 @@ public:
     }
 
     LC.erase(i);
-    LRc.insert(j);
+    LRc.insert(i);
     std::vector<double> lls = std::vector<double>(K, 0.0);
     for(uint i=0;i<K;++i){
       lls[i] = logLikelihood(i);
